@@ -1,10 +1,12 @@
 import express from 'express';
 import UserRouter from './UserRoutes/users.route.mjs';
+import ContentRouter from './content/content.route.mjs';
 const router = express.Router();
 
 class AllRoutes {
     static routes() {
         router.use("/admin", UserRouter);
+        router.use('/content',ContentRouter);
 
         router.use("*", async (req, res) => {
             return res.status(500).json({

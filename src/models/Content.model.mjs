@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import dbConnection from "../config/db.config.mjs";
+
 const Content = dbConnection.define('Content', {
     id: {
         type: DataTypes.BIGINT,
@@ -31,12 +32,12 @@ const Content = dbConnection.define('Content', {
         sequelize: dbConnection,
         tableName: 'Content',
         timestamps: false,
-        hooks: {
-            afterSync: async () => {
-                await dbConnection.query(`
-        ALTER TABLE Content 
-    `);
-            }
-        }
+    //     hooks: {
+    //         afterSync: async () => {
+    //             await dbConnection.query(`
+    //     ALTER TABLE Content 
+    // `);
+    //         }
+    //     }
     });
 export default Content;

@@ -5,7 +5,7 @@ import AuthService from '../services/AuthService.mjs';
 class AuthController {
     // Register a new user
     async register(req, res) {
-        const { password, mobile, email, userType, fullName } = req.body;
+        const { username, password, mobile, email, userType, fullName } = req.body;
 
         try {
             const existingUser = await User.findOne({

@@ -26,7 +26,7 @@ class AuthService {
 
         const users = await User.findAll({
             attributes: ['id', 'username', 'password', 'user_type', 'role',
-                'full_name', 'email', 'mobile', 'grade', 'schoolId'],
+                'full_name', 'email', 'mobile',],
 
             ...whereCondition
         });

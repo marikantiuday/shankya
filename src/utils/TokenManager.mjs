@@ -4,17 +4,31 @@ import jwt from 'jsonwebtoken';
 
 class TokenManager {
     generateAccessToken(user) {
-        return jwt.sign({ id: user.id, role: user.role }, jwtConfig.ACCESS_TOKEN_SECRET, { expiresIn: jwtConfig.ACCESS_TOKEN_EXPIRY });
+        return jwt.sign({
+            id: user.id,
+            role: user.role,
+            grade: user.grade,
+            schoolId: user.schoolId,
+            userType: user.user_type
+        },
+            jwtConfig.ACCESS_TOKEN_SECRET,
+            { expiresIn: jwtConfig.ACCESS_TOKEN_EXPIRY });
     }
 
     generateRefreshToken(user) {
-        return jwt.sign({ id: user.id }, jwtConfig.REFRESH_TOKEN_SECRET, { expiresIn: jwtConfig.REFRESH_TOKEN_EXPIRY });
+        return jwt.sign({
+            id: user?.id,
+            role: user?.role,
+            grade: user?.grade,
+            schoolId: user?.schoolId,
+            userType: user?.user_type
+        }, jwtConfig.REFRESH_TOKEN_SECRET, { expiresIn: jwtConfig.REFRESH_TOKEN_EXPIRY });
     }
 
     async saveTokens(user, accessToken, refreshToken, ipAddress = null, deviceInfo = null) {
         // multilogin user support
         // const activeTokens = await Token.count({ where: { user_id: user.id } });
-        // const maxLogins = 5;
+        // const maxLogins = 5
 
         // if (activeTokens >= maxLogins) {
         //     const oldestToken = await Token.findOne({ where: { use_iId: user.id }, order: [['id', 'ASC']] });
@@ -49,8 +63,8 @@ class TokenManager {
         return await Token.findOne({ where: { refresh_token: refreshToken } });
     }
 
-    async findToken(token, refreshToken) {
-        return await Token.findOne({ where: { token, refresh_token: refreshToken } });
+    async findToken(refreshToken) {
+        return await Token.findOne({ where: { refresh_token: refreshToken } });
     }
 
     verifyAccessToken(token) {
@@ -68,6 +82,28 @@ class TokenManager {
             return { valid: true };
         } catch (error) {
             if (error.name === "TokenExpiredError") return { valid: false, error: "Session Expired!" }
+            return { valid: false, error: error.message };
+        }
+    }
+
+    async getRefreshToken(token) {
+        try {
+            let refreshToken = '';
+            if (token) {
+                const findToken = await Token.findOne({
+                    where: {
+                        token: token
+                    }
+                });
+
+                if (!findToken)
+                    throw new Error({ message: "Invalid token!" });
+
+                refreshToken = findToken.refresh_token;
+            }
+
+            return { valid: true, refreshToken };
+        } catch (error) {
             return { valid: false, error: error.message };
         }
     }
